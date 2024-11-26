@@ -342,46 +342,50 @@ class injectNoiseToLatent:
         return (samples,)
 
 
-from ..libs.api.stability import stableAPI
-class stableDiffusion3API:
+try:
+    from ..libs.api.stability import stableAPI
 
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "positive": ("STRING", {"default": "", "placeholder": "Positive", "multiline": True}),
-                "negative": ("STRING", {"default": "", "placeholder": "Negative", "multiline": True}),
-                "model": (["sd3", "sd3-turbo"],),
-                "aspect_ratio": (['16:9', '1:1', '21:9', '2:3', '3:2', '4:5', '5:4', '9:16', '9:21'],),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 4294967294}),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
-            },
-            "optional": {
-                "optional_image": ("IMAGE",),
-            },
-            "hidden": {
-                "unique_id": "UNIQUE_ID",
-                "extra_pnginfo": "EXTRA_PNGINFO",
-            },
-        }
+    class stableDiffusion3API:
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
+        @classmethod
+        def INPUT_TYPES(s):
+            return {
+                "required": {
+                    "positive": ("STRING", {"default": "", "placeholder": "Positive", "multiline": True}),
+                    "negative": ("STRING", {"default": "", "placeholder": "Negative", "multiline": True}),
+                    "model": (["sd3", "sd3-turbo"],),
+                    "aspect_ratio": (['16:9', '1:1', '21:9', '2:3', '3:2', '4:5', '5:4', '9:16', '9:21'],),
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 4294967294}),
+                    "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
+                },
+                "optional": {
+                    "optional_image": ("IMAGE",),
+                },
+                "hidden": {
+                    "unique_id": "UNIQUE_ID",
+                    "extra_pnginfo": "EXTRA_PNGINFO",
+                },
+            }
 
-    FUNCTION = "generate"
-    OUTPUT_NODE = False
+        RETURN_TYPES = ("IMAGE",)
+        RETURN_NAMES = ("image",)
 
-    CATEGORY = "EasyUse/🚫 Deprecated"
-    DEPRECATED = True
+        FUNCTION = "generate"
+        OUTPUT_NODE = False
+
+        CATEGORY = "EasyUse/🚫 Deprecated"
+        DEPRECATED = True
 
 
-    def generate(self, positive, negative, model, aspect_ratio, seed, denoise, optional_image=None, unique_id=None, extra_pnginfo=None):
-        stableAPI.getAPIKeys()
-        mode = 'text-to-image'
-        if optional_image is not None:
-            mode = 'image-to-image'
-        output_image = stableAPI.generate_sd3_image(positive, negative, aspect_ratio, seed=seed, mode=mode, model=model, strength=denoise, image=optional_image)
-        return (output_image,)
+        def generate(self, positive, negative, model, aspect_ratio, seed, denoise, optional_image=None, unique_id=None, extra_pnginfo=None):
+            stableAPI.getAPIKeys()
+            mode = 'text-to-image'
+            if optional_image is not None:
+                mode = 'image-to-image'
+            output_image = stableAPI.generate_sd3_image(positive, negative, aspect_ratio, seed=seed, mode=mode, model=model, strength=denoise, image=optional_image)
+            return (output_image,)
+except Exception:
+    print("Stable Diffusion 3 API is not available")
 
 
 class saveImageLazy():
@@ -500,7 +504,6 @@ NODE_CLASS_MAPPINGS = {
     "easy latentNoisy": latentNoisy,
     "easy latentCompositeMaskedWithCond": latentCompositeMaskedWithCond,
     "easy injectNoiseToLatent": injectNoiseToLatent,
-    "easy stableDiffusion3API": stableDiffusion3API,
     "easy saveImageLazy": saveImageLazy,
     "easy saveTextLazy": saveTextLazy,
     "easy showAnythingLazy": showAnythingLazy,
@@ -514,8 +517,12 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "easy latentNoisy": "LatentNoisy (🚫Deprecated)",
     "easy latentCompositeMaskedWithCond": "LatentCompositeMaskedWithCond (🚫Deprecated)",
     "easy injectNoiseToLatent": "InjectNoiseToLatent (🚫Deprecated)",
-    "easy stableDiffusion3API": "StableDiffusion3API (🚫Deprecated)",
     "easy saveImageLazy": "SaveImageLazy (🚫Deprecated)",
     "easy saveTextLazy": "SaveTextLazy (🚫Deprecated)",
     "easy showAnythingLazy": "ShowAnythingLazy (🚫Deprecated)",
 }
+
+
+if "stableDiffusion3API" in dir():
+    NODE_CLASS_MAPPINGS["easy stableDiffusion3API"] = stableDiffusion3API
+    NODE_DISPLAY_NAME_MAPPINGS["easy stableDiffusion3API"] = "StableDiffusion3API (🚫Deprecated)"
